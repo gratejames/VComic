@@ -32,7 +32,6 @@
             android:layout_weight="1"
             android:contentDescription="@string/removeLinkButtonText"
             android:src="@drawable/baseline_edit_24"
-            app:layout_constraintEnd_toStartOf="@+id/closeButton"
             app:layout_constraintStart_toEndOf="@+id/addButton"
             app:layout_constraintTop_toTopOf="parent" />
 
