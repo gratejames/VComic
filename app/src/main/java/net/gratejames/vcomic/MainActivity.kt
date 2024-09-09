@@ -78,7 +78,7 @@ abstract class AppDatabase : RoomDatabase() {
 
 class MainActivity : ComponentActivity() {
     enum class MODE {
-        NONE, EDIT, ADD, SORT
+        NONE, EDIT, ADD
     }
 
     var clearHistoryAfterNextLoad = false
@@ -111,9 +111,8 @@ class MainActivity : ComponentActivity() {
         val comicView = findViewById<WebView>(R.id.webView)
         val editPanelName = findViewById<EditText>(R.id.editName)
         val editPanelLink = findViewById<EditText>(R.id.editLink)
-        val sortButton = findViewById<ImageButton>(R.id.sortButton)
-        val sortPanel = findViewById<ConstraintLayout>(R.id.sortLayout)
-        val zoomSlider = findViewById<SeekBar>(R.id.zoomSlider)
+        val sortUpButton = findViewById<ImageButton>(R.id.moveUpButton)
+        val sortDownButton = findViewById<ImageButton>(R.id.moveDownButton)
 
         comicView.getSettings().builtInZoomControls = true;
         comicView.getSettings().displayZoomControls = false;
@@ -182,32 +181,7 @@ class MainActivity : ComponentActivity() {
 
         var mode = MODE.NONE
 
-        zoomSlider.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {
-                val curComic = comics[comicSpinner.selectedItemPosition]
-                curComic.zoom = progress-3
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        sortButton.setOnClickListener {
-            if (mode == MODE.NONE) {
-                mode = MODE.SORT
-                editButton.isEnabled = false
-                addButton.isEnabled = false
-                sortPanel.visibility = View.VISIBLE
-                zoomSlider.progress = comics[comicSpinner.selectedItemPosition].zoom+3
-            } else if (mode == MODE.SORT) {
-                mode = MODE.NONE
-                editButton.isEnabled = true
-                addButton.isEnabled = true
-                sortPanel.visibility = View.GONE
-            }
-        }
-
-        findViewById<ImageButton>(R.id.moveUpButton).setOnClickListener {
+        sortUpButton.setOnClickListener {
             if (comicSpinner.selectedItemPosition <= 0) {
                 Toast.makeText(this@MainActivity, "Already at the top", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -230,7 +204,7 @@ class MainActivity : ComponentActivity() {
             spinnerAdapter.notifyDataSetChanged()
 
         }
-        findViewById<ImageButton>(R.id.moveDownButton).setOnClickListener {
+        sortDownButton.setOnClickListener {
             if (comicSpinner.selectedItemPosition == comics.size - 1) {
                 Toast.makeText(this@MainActivity, "Already at the bottom", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -259,6 +233,8 @@ class MainActivity : ComponentActivity() {
                 editButton.isEnabled = false
                 editPanel.visibility = View.VISIBLE
                 deleteButton.visibility = View.GONE
+                sortUpButton.visibility = View.GONE
+                sortDownButton.visibility = View.GONE
                 editPanelName.setText("")
                 editPanelLink.setText("")
                 comicSpinner.isEnabled = false
@@ -296,6 +272,8 @@ class MainActivity : ComponentActivity() {
                 addButton.isEnabled = false
                 editPanel.visibility = View.VISIBLE
                 deleteButton.visibility = View.VISIBLE
+                sortUpButton.visibility = View.VISIBLE
+                sortDownButton.visibility = View.VISIBLE
                 editPanelName.setText(comics[comicSpinner.selectedItemPosition].name)
                 editPanelLink.setText(comics[comicSpinner.selectedItemPosition].link)
                 comicSpinner.isEnabled = false
@@ -335,14 +313,6 @@ class MainActivity : ComponentActivity() {
         }
         findViewById<ImageButton>(R.id.forwardButton).setOnClickListener {
             comicView.goForward()
-        }
-        findViewById<ImageButton>(R.id.zoomInButton).setOnClickListener {
-            comicView.zoomIn()
-            comics[comicSpinner.selectedItemPosition].zoom ++
-        }
-        findViewById<ImageButton>(R.id.zoomOutButton).setOnClickListener {
-            comicView.zoomOut()
-            comics[comicSpinner.selectedItemPosition].zoom --
         }
     }
 }
